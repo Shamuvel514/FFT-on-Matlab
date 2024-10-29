@@ -1,0 +1,66 @@
+% Project: Frequency Analysis and Noise Filtering using FFT
+
+% 1. Signal Parameters
+Fs = 1000;          % Sampling frequency (Hz)
+T = 1/Fs;           % Sampling period (s)
+L = 1000;           % Length of the signal (samples)
+t = (0:L-1)*T;      % Time vector
+
+% 2. Generate a Signal with Multiple Frequencies
+f1 = 50;            % Frequency of the first sine wave (Hz)
+f2 = 150;           % Frequency of the second sine wave (Hz)
+A1 = 1.0;           % Amplitude of the first sine wave
+A2 = 0.5;           % Amplitude of the second sine wave
+
+signal = A1*sin(2*pi*f1*t) + A2*sin(2*pi*f2*t);
+
+% 3. Add Noise to the Signal
+noise = 1.5*randn(size(t));   % Generate random noise
+noisy_signal = signal + noise;
+
+% 4. Plot the Noisy Signal
+figure;
+plot(t, noisy_signal);
+title('Noisy Signal');
+xlabel('Time (s)');
+ylabel('Amplitude');
+
+% 5. Compute the FFT of the Noisy Signal
+Y = fft(noisy_signal);
+P2 = abs(Y/L);                 % Two-sided spectrum
+P1 = P2(1:L/2+1);              % Single-sided spectrum
+P1(2:end-1) = 2*P1(2:end-1);
+f = Fs*(0:(L/2))/L;            % Frequency domain vector
+
+% 6. Plot the Single-Sided Amplitude Spectrum
+figure;
+plot(f, P1);
+title('Single-Sided Amplitude Spectrum of Noisy Signal');
+xlabel('Frequency (Hz)');
+ylabel('Magnitude');
+
+% 7. Design a Low-Pass Filter to Remove Noise
+fc = 180;                      % Cut-off frequency (Hz)
+[b, a] = butter(6, fc/(Fs/2), 'low');  % 6th order low-pass Butterworth filter
+
+% 8. Apply the Filter to the Noisy Signal
+filtered_signal = filter(b, a, noisy_signal);
+
+% 9. Plot the Filtered Signal
+figure;
+plot(t, filtered_signal);
+title('Filtered Signal');
+xlabel('Time (s)');
+ylabel('Amplitude');
+
+% 10. Compute and Plot the FFT of the Filtered Signal
+Y_filtered = fft(filtered_signal);
+P2_filtered = abs(Y_filtered/L);
+P1_filtered = P2_filtered(1:L/2+1);
+P1_filtered(2:end-1) = 2*P1_filtered(2:end-1);
+
+figure;
+plot(f, P1_filtered);
+title('Single-Sided Amplitude Spectrum of Filtered Signal');
+xlabel('Frequency (Hz)');
+ylabel('Magnitude');￼Enter
